@@ -1,0 +1,7 @@
+{
+  "type": "module",
+  "dependencies": {
+    "inquirer": "^10.2.2",
+    "word-list": "^4.0.0"
+  }
+}
