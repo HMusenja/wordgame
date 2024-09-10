@@ -2,6 +2,7 @@ import fs from 'fs';
 import inquirer from 'inquirer';
 import { fileURLToPath } from 'url';
 import path from 'path';
+import chalk from 'chalk'; // Import chalk for colorizing the output
 
 // Convert __dirname for ES Modules
 const __filename = fileURLToPath(import.meta.url);
@@ -45,7 +46,7 @@ function generateLetters() {
 // Function to play one round of the game
 async function playRound() {
     let letters = generateLetters(); // Generate a new set of letters for this round
-    console.log(`Round ${round}: Available letters -> ${letters.join(', ')}`);
+    console.log(chalk.blue.bold(`\nRound ${round}: Available letters -> ${letters.join(', ')}`));
 
     // Get the user's word
     let { userWord } = await inquirer.prompt({
@@ -64,9 +65,9 @@ async function playRound() {
     let userWordScore = 0;
     if (isValidWord(userWord)) {
         userWordScore = userWord.length;
-        console.log(`Your word: ${userWord} (Score: ${userWordScore})`);
+        console.log(chalk.green.bold(`Your word: ${userWord} (Score: ${userWordScore})`));
     } else {
-        console.log(`${userWord} is not a valid English word. You score 0 points.`);
+        console.log(chalk.red.bold(`${userWord} is not a valid English word. You score 0 points.`));
     }
 
     // Update user's score only if the word is valid
@@ -75,12 +76,12 @@ async function playRound() {
     // Now it's the computer's turn
     let computerWord = generateComputerWord(letters);
     let computerWordScore = computerWord.length;
-    console.log(`Computer's word: ${computerWord} (Score: ${computerWordScore})`);
+    console.log(chalk.cyan.bold(`Computer's word: ${computerWord} (Score: ${computerWordScore})`));
 
     // Update computer's score
     computerScore += computerWordScore;
 
-    console.log(`Current Scores => You: ${userScore}, Computer: ${computerScore}`);
+    console.log(chalk.yellow.bold(`Current Scores => You: ${userScore}, Computer: ${computerScore}`));
     round++;
 }
 
@@ -104,17 +105,18 @@ async function playGame() {
     }
 
     // Display the final score after all rounds are complete
-    console.log(`Final Scores => You: ${userScore}, Computer: ${computerScore}`);
+    console.log(chalk.yellow.bold(`\nFinal Scores => You: ${userScore}, Computer: ${computerScore}`));
 
     // Determine the winner
     if (userScore > computerScore) {
-        console.log('You win! 🎉');
+        console.log(chalk.green.bold('You win! 🎉'));
     } else if (computerScore > userScore) {
-        console.log('Computer wins! 🤖');
+        console.log(chalk.red.bold('Computer wins! 🤖'));
     } else {
-        console.log("It's a tie! 🤝");
+        console.log(chalk.blue.bold("It's a tie! 🤝"));
     }
 }
 
 // Start the game
 playGame();
+
