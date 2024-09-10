@@ -9,11 +9,11 @@ const __dirname = path.dirname(__filename);
 
 // Load word-list from the package
 const wordListPath = path.join(__dirname, 'node_modules', 'word-list', 'words.txt');
-const wordArray = fs.readFileSync(wordListPath, 'utf8').split('\n');
+const wordArray = fs.readFileSync(wordListPath, 'utf8').split('\n'); // Load the words into an array
 
 // Utility function to check if a word is valid
 function isValidWord(word) {
-    return wordArray.includes(word.toLowerCase());
+    return wordArray.includes(word.toLowerCase()); // Check if the word exists in the word list
 }
 
 const vowels = ['a', 'e', 'i', 'o', 'u'];
@@ -23,11 +23,12 @@ let userScore = 0;
 let computerScore = 0;
 const rounds = 5;
 
+// Function to generate a set of random letters
 function generateLetters() {
     let letters = [];
-    let numberOfVowels = Math.floor(Math.random() * 4) + 3; // 3-4 vowels
+    let numberOfVowels = Math.floor(Math.random() * 4) + 3; // Generate 3-4 vowels
 
-    // Prioritize vowels
+    // Add vowels
     for (let i = 0; i < numberOfVowels; i++) {
         letters.push(vowels[Math.floor(Math.random() * vowels.length)]);
     }
@@ -37,14 +38,16 @@ function generateLetters() {
         letters.push(consonants[Math.floor(Math.random() * consonants.length)]);
     }
 
-    return letters.sort(() => Math.random() - 0.5); // Shuffle the letters
+    // Shuffle the letters randomly and return
+    return letters.sort(() => Math.random() - 0.5);
 }
 
+// Function to play one round of the game
 async function playRound() {
-    let letters = generateLetters();
+    let letters = generateLetters(); // Generate a new set of letters for this round
     console.log(`Round ${round}: Available letters -> ${letters.join(', ')}`);
 
-    // Get user word
+    // Get the user's word
     let { userWord } = await inquirer.prompt({
         type: 'input',
         name: 'userWord',
@@ -53,46 +56,57 @@ async function playRound() {
             if (!input || input.length < 2) {
                 return 'Please enter a valid word with at least 2 letters.';
             }
-            if (!isValidWord(input)) {
-                return 'Not a valid English word. Try again!';
-            }
             return true;
         }
     });
 
-    // Calculate user's score
-    let userWordScore = userWord.length;
-    console.log(`Your word: ${userWord} (Score: ${userWordScore})`);
+    // Check if the user's word is valid
+    let userWordScore = 0;
+    if (isValidWord(userWord)) {
+        userWordScore = userWord.length;
+        console.log(`Your word: ${userWord} (Score: ${userWordScore})`);
+    } else {
+        console.log(`${userWord} is not a valid English word. You score 0 points.`);
+    }
 
-    // Simulate computer's word
+    // Update user's score only if the word is valid
+    userScore += userWordScore;
+
+    // Now it's the computer's turn
     let computerWord = generateComputerWord(letters);
     let computerWordScore = computerWord.length;
     console.log(`Computer's word: ${computerWord} (Score: ${computerWordScore})`);
 
-    // Update scores
-    userScore += userWordScore;
+    // Update computer's score
     computerScore += computerWordScore;
 
     console.log(`Current Scores => You: ${userScore}, Computer: ${computerScore}`);
     round++;
 }
 
+// Function for the computer to generate a valid word
 function generateComputerWord(letters) {
     // Simulate the computer forming a word from the available letters
     let randomWord = '';
     while (randomWord.length < 3 || !isValidWord(randomWord)) {
-        randomWord = letters.sort(() => Math.random() - 0.5).slice(0, Math.floor(Math.random() * letters.length)).join('');
+        // Try to form a word by randomly rearranging the letters
+        randomWord = letters.sort(() => Math.random() - 0.5)
+            .slice(0, Math.floor(Math.random() * letters.length)) // Pick a random length of letters
+            .join('');
     }
     return randomWord;
 }
 
+// Main game loop
 async function playGame() {
     while (round <= rounds) {
-        await playRound();
+        await playRound(); // Play one round of the game
     }
 
+    // Display the final score after all rounds are complete
     console.log(`Final Scores => You: ${userScore}, Computer: ${computerScore}`);
 
+    // Determine the winner
     if (userScore > computerScore) {
         console.log('You win! 🎉');
     } else if (computerScore > userScore) {
